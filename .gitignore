@@ -3,5 +3,8 @@ dist
 .DS_Store
 *.local
 .vite
+.env
+.env.*
+.vercel
 screenshot.png
 test.png
