@@ -1,0 +1,6 @@
+The Unspoken - book animation frames (v2, leather book with title)
+desktop/  75 frames, 1920x1080 WebP, frame_001..frame_075 (15fps source, 5s)
+mobile/   75 frames, 800x592 WebP, central crop so the book stays in frame
+hero-first.webp / hero-final.webp  poster stills (closed book / open spread)
+Audio removed. Stray text glitch near top-right (1.5-3.2s) masked.
+Known: cover turns grey-blue and title flickers during the lift (~1.5-2.2s).
