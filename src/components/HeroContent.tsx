@@ -14,7 +14,7 @@ export const HeroContent: React.FC<HeroContentProps> = ({
 
   return (
     <div
-      className={`relative z-20 flex flex-col justify-center max-w-xl transition-opacity duration-300 ${
+      className={`relative z-20 flex flex-col justify-center max-w-[40vw] transition-opacity duration-300 pt-[calc(5rem+1.5rem)] ${
         isInteractive ? "pointer-events-auto" : "pointer-events-none select-none"
       }`}
       style={{

@@ -23,6 +23,7 @@ export const IntroScroller: React.FC<IntroScrollerProps> = ({
     scrollProgress,
     logoOpacity,
     heroOpacity,
+    canvasOpacity,
     prefersReducedMotion,
   } = scrollerState;
 
@@ -35,7 +36,7 @@ export const IntroScroller: React.FC<IntroScrollerProps> = ({
     <section
       id="top"
       ref={containerRef}
-      className="relative w-full h-screen overflow-hidden bg-[#111113] intro-surface select-none"
+      className="relative w-full h-screen overflow-hidden bg-black intro-surface select-none"
       aria-label="The Unspoken Animated Hero Presentation"
     >
       {/* Canvas for smooth WebP frame sequence */}
@@ -43,11 +44,18 @@ export const IntroScroller: React.FC<IntroScrollerProps> = ({
         ref={canvasRef}
         className="absolute inset-0 w-full h-full block z-10"
         aria-hidden="true"
+        style={{
+          opacity: prefersReducedMotion ? 1 : canvasOpacity,
+          maskImage:
+            "linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%)",
+        }}
       />
 
       {/* Loading State Overlay */}
       <div
-        className={`absolute inset-0 z-40 flex items-center justify-center bg-[#111113] transition-opacity duration-1000 ${
+        className={`absolute inset-0 z-40 flex items-center justify-center bg-black transition-opacity duration-1000 ${
           prefersReducedMotion ? "hidden" : isReady ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
         aria-busy={!isReady}
@@ -70,7 +78,7 @@ export const IntroScroller: React.FC<IntroScrollerProps> = ({
         </div>
       </div>
 
-      {/* Intro Logo Lockup (Centered over closed book, fades in, fades out first 10% scroll) */}
+      {/* Intro Logo Lockup (Centered over black background, fades out first 15% while book fades in) */}
       <div
         className={`absolute inset-0 z-20 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
           logoOpacity <= 0.01 ? "hidden" : "flex"
@@ -93,15 +101,35 @@ export const IntroScroller: React.FC<IntroScrollerProps> = ({
         />
       </div>
 
-      {/* Hero Content (Appears in last 20% of scroll on the left on desktop, stacked on mobile) */}
+      {/* Hero Content (Appears in last 20% of scroll, on the left; book anchored right) */}
       <div className="absolute inset-0 z-20 flex items-center px-6 sm:px-12 md:px-16 lg:px-24">
-        <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-center">
+        {/* Subtle dark gradient behind the text for contrast against the book */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-[55%] z-0"
+          style={{
+            background:
+              "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0) 100%)",
+          }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-center">
           <HeroContent
             opacity={heroOpacity}
             reducedMotion={prefersReducedMotion}
           />
         </div>
       </div>
+
+      {/* Bottom fade into the next section (#111113) over ~20vh */}
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 right-0 z-30"
+        style={{
+          height: "20vh",
+          background:
+            "linear-gradient(to bottom, rgba(17,17,19,0) 0%, rgba(17,17,19,1) 100%)",
+        }}
+        aria-hidden="true"
+      />
 
       {/* Scroll Cue at Bottom Center */}
       <ScrollCue opacity={scrollCueOpacity} />

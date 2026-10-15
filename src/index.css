@@ -24,6 +24,11 @@ body,
   min-height: 100%;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   background: #111113;
@@ -38,7 +43,7 @@ html.light body {
 }
 
 .intro-surface {
-  background: #111113;
+  background: #000000;
   color: #f0e8e1;
 }
 

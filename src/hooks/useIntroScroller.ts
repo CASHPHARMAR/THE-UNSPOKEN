@@ -7,11 +7,12 @@ import {
   MOBILE_BREAKPOINT,
   SCRUB,
   READY_FRAME_COUNT,
-  DESKTOP_FRAME_HEIGHT_RATIO,
+  DESKTOP_FRAME_WIDTH_RATIO,
   PATHS,
   frameSrc,
   easeHero,
   easeLogo,
+  easeCanvas,
 } from "../config/site";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -23,6 +24,7 @@ export interface UseIntroScrollerReturn {
   scrollProgress: number;
   logoOpacity: number;
   heroOpacity: number;
+  canvasOpacity: number;
   isPastIntro: boolean;
   prefersReducedMotion: boolean;
   isMobile: boolean;
@@ -53,6 +55,7 @@ export function useIntroScroller(): UseIntroScrollerReturn {
   const [scrollProgress, setScrollProgress] = useState(() => (prefersReducedMotion ? 1 : 0));
   const [logoOpacity, setLogoOpacity] = useState(() => (prefersReducedMotion ? 0 : 1));
   const [heroOpacity, setHeroOpacity] = useState(() => (prefersReducedMotion ? 1 : 0));
+  const [canvasOpacity, setCanvasOpacity] = useState(() => (prefersReducedMotion ? 1 : 0));
   const [isPastIntro, setIsPastIntro] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== "undefined") {
@@ -124,8 +127,8 @@ export function useIntroScroller(): UseIntroScrollerReturn {
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // Fill dark Midnight background
-      ctx.fillStyle = "#111113";
+      // Fill pure black background (matches the frame backgrounds)
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, width, height);
 
       // Find image to draw
@@ -163,20 +166,13 @@ export function useIntroScroller(): UseIntroScrollerReturn {
 
           ctx.drawImage(img, destX, destY, destWidth, destHeight);
         } else {
-          // Desktop layout: anchor frame toward the right, scaled to about 90% height,
-          // so the left side stays dark for the headline.
+          // Desktop layout: anchor frame to the right edge and scale by width
+          // so the open book's left edge sits around 55% of the viewport width,
+          // keeping the left 45% free for the hero text.
           const aspect = img.naturalWidth / img.naturalHeight;
-          let destHeight = height * DESKTOP_FRAME_HEIGHT_RATIO;
-          let destWidth = destHeight * aspect;
-
-          // If on narrower screens, ensure width doesn't overpower the container
-          if (destWidth > width * 0.72) {
-            destWidth = width * 0.72;
-            destHeight = destWidth / aspect;
-          }
-
-          // Anchor toward the right
-          const destX = width - destWidth - width * 0.02;
+          const destWidth = width * DESKTOP_FRAME_WIDTH_RATIO;
+          const destHeight = destWidth / aspect;
+          const destX = width - destWidth;
           const destY = (height - destHeight) / 2;
 
           ctx.drawImage(img, destX, destY, destWidth, destHeight);
@@ -280,6 +276,7 @@ export function useIntroScroller(): UseIntroScrollerReturn {
     if (prefersReducedMotion) {
       setLogoOpacity(0);
       setHeroOpacity(1);
+      setCanvasOpacity(1);
       setScrollProgress(1);
       setIsPastIntro(false);
       return;
@@ -299,8 +296,11 @@ export function useIntroScroller(): UseIntroScrollerReturn {
         const progress = self.progress;
         setScrollProgress(progress);
 
-        // Logo fade: 1.0 down to 0 during the first 10%
+        // Logo fade: 1.0 down to 0 during the first 15%
         setLogoOpacity(easeLogo(progress));
+
+        // Canvas (book) fade: 0 up to 1.0 during the first 15%
+        setCanvasOpacity(easeCanvas(progress));
 
         // Hero fade: 0 up to 1.0 during the last 20%
         setHeroOpacity(easeHero(progress));
@@ -331,6 +331,7 @@ export function useIntroScroller(): UseIntroScrollerReturn {
       if (!isNaN(p)) {
         setScrollProgress(p);
         setLogoOpacity(easeLogo(p));
+        setCanvasOpacity(easeCanvas(p));
         setHeroOpacity(easeHero(p));
         const initialFrame = Math.min(
           FRAME_COUNT,
@@ -363,6 +364,7 @@ export function useIntroScroller(): UseIntroScrollerReturn {
     scrollProgress,
     logoOpacity,
     heroOpacity,
+    canvasOpacity,
     isPastIntro,
     prefersReducedMotion,
     isMobile,
